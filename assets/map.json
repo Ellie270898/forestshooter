@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "forestsmaller.png",
+	"frame": {"x":0,"y":0,"w":4096,"h":650},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":4096,"h":650},
+	"sourceSize": {"w":4096,"h":650}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "map.png",
+	"format": "RGBA8888",
+	"size": {"w":4096,"h":650},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:196345d9a980b14f878b4f7021064bd0:f6c08038c25ddc6ba4f5c1a527e025f5:68463c66230aaeb26021edb8ea8cd9b6$"
+}
+}
