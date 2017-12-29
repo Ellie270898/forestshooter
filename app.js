@@ -3,36 +3,33 @@ var game = new Phaser.Game(650, 650, Phaser.CANVAS, 'phaser-example', { preload:
 function preload() {
 
     game.load.image('background','assets/forestmap.png');
-    game.load.image('player','assets/character3.png');
-    game.load.spritesheet('run', 'assets/animation2.png', 650, 650);
+    game.load.image('playerimage','assets/character3.png');
+    game.load.spritesheet('moving', 'assets/animation3.png', 650, 650);
 
 }
 
-var player;
+var player1;
 var cursors;
+//var moving;
 
 function create() {
 
-    mysprite = this.game.add.sprite(15, 30, 'run');
-    mysprite.frame = 3;
-
-    mysprite.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 10, true);
-
-    mysprite.animations.play('right');
+    game.physics.startSystem(Phaser.Physics.P2JS);
 
     game.add.tileSprite(0, 0, 4094, 650, 'background');
 
     game.world.setBounds(0, 0, 4094, 650);
 
-    game.physics.startSystem(Phaser.Physics.P2JS);
+    player1 = this.moving=game.add.sprite(20, 20, "moving");
+      this.moving.animations.add('still', [11], 1, true);
+      this.moving.animations.add('walk', [11,0,1,2,3,4,5,6,7,8,9,10,11], 17, true);
+      this.speed = 4;
 
-    player = game.add.sprite(0, 0, 'player');
+//    player1 = game.add.sprite(0, 0, 'playerimage');
 
-    game.physics.p2.enable(player);
+  //  game.physics.p2.enable(player1);
 
-    cursors = game.input.keyboard.createCursorKeys();
-
-    game.camera.follow(player);
+    game.camera.follow(player1);
 
 
 
@@ -40,31 +37,51 @@ function create() {
 
 function update() {
 
-    player.body.setZeroVelocity();
+//    player1.body.setZeroVelocity();
 
-    if (cursors.up.isDown)
-    {
-        player.body.moveUp(300)
-    }
-    else if (cursors.down.isDown)
-    {
-        player.body.moveDown(300);
-    }
+  //  if (cursors.up.isDown)
+  //  {
+  //      player1.body.moveUp(300)
+  //  }
+  //  else if (cursors.down.isDown)
+  //  {
+  //      player1.body.moveDown(300);
+  //  }
 
-    if (cursors.left.isDown)
-    {
-        player.body.velocity.x = -300;
-    }
-    else if (cursors.right.isDown)
-    {
-        player.body.moveRight(300);
-    }
+  //  if (cursors.left.isDown)
+  //  {
+  //      player1.body.velocity.x = -300;
+  //  }
+  //  else if (cursors.right.isDown)
+  //  {
+    //    player1.body.moveRight(300);
+  //  }
+  if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+      {
+        this.moving.x-=this.speed;
+        this.moving.play('walk');
+      //this.moving.scale.x=-1;
+        game.camera.x = player1.x - 600;
+        game.camera.y = player1.y - 600;
 
+      }
+      else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+      {
+        this.moving.x+=this.speed;
+        this.moving.play('walk');
+      //  this.moving.scale.x=1;
+        game.camera.x = player1.x - 600;
+        game.camera.y = player1.y - 600;
+
+      } else
+      {
+        this.moving.play('still');
+      }
 }
 
 function render() {
 
     game.debug.cameraInfo(game.camera, 32, 32);
-    game.debug.spriteCoords(player, 32, 500);
+   // game.debug.spriteCoords(player1, 32, 500);
 
 }
