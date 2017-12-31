@@ -4,7 +4,7 @@ function preload() {
 
     game.load.image('background','assets/forestmap.png');
     game.load.image('playerimage','assets/character3.png');
-    game.load.spritesheet('moving', 'assets/animation3.png', 650, 650);
+    game.load.spritesheet('moving', 'assets/animation6.png', 108, 140);
 
 }
 
@@ -20,9 +20,9 @@ function create() {
 
     game.world.setBounds(0, 0, 4094, 650);
 
-    player1 = this.moving=game.add.sprite(20, 20, "moving");
-      this.moving.animations.add('still', [11], 1, true);
-      this.moving.animations.add('walk', [11,0,1,2,3,4,5,6,7,8,9,10,11], 17, true);
+    player1 = this.moving=game.add.sprite(120, 450, "moving");
+      this.moving.animations.add('still', [8], 1, true);
+      this.moving.animations.add('walk', [0,1,2,3,4,5,6,7], 22, true);
       this.speed = 4;
 
 //    player1 = game.add.sprite(0, 0, 'playerimage');
@@ -60,7 +60,7 @@ function update() {
       {
         this.moving.x-=this.speed;
         this.moving.play('walk');
-      //this.moving.scale.x=-1;
+        this.moving.scale.x=-1;
         game.camera.x = player1.x - 600;
         game.camera.y = player1.y - 600;
 
@@ -69,7 +69,7 @@ function update() {
       {
         this.moving.x+=this.speed;
         this.moving.play('walk');
-      //  this.moving.scale.x=1;
+        this.moving.scale.x=1;
         game.camera.x = player1.x - 600;
         game.camera.y = player1.y - 600;
 
