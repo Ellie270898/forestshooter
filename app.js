@@ -3,17 +3,17 @@ const mainState =
 {
         preload: function ()
        {
-          
+
+          game.load.spritesheet('cat', 'assets/catSpritesheet.png', 650, 650)
           game.load.image('bullet', 'assets/bullet.png');
           game.load.image('background','assets/forestmap.png');
           game.load.spritesheet('spritesheet', 'assets/animation7.png', 108, 140);
           game.load.image('foreground', 'assets/foreground.png');
-          game.load.image('ship', 'assets/ship.png');
           game.load.image('greyspider', 'assets/greyspider2.png');
           game.load.spritesheet('spider', 'assets/spiderSpritesheet.png', 600, 725 );
           game.load.spritesheet('spider2', 'assets/spiderSpritesheet.png', 600, 725 );
           game.load.image('gameover', 'assets/gameoverscreen2.png');
-
+          game.load.image('gamewin', 'assets/gamewinscreen.png');
       },
 
 
@@ -30,6 +30,14 @@ const mainState =
           game.add.tileSprite(0, 0, 3440, 650, 'background');
 
           game.world.setBounds(0, 0, 3040, 650);
+
+          this.gameEnd = this.cat = game.add.sprite(2700, -30, 'cat');
+          this.gameEnd.enableBody = true;
+          game.physics.arcade.enable(this.gameEnd);
+          this.gameEnd.physicsBodyType = Phaser.Physics.ARCADE;
+          this.gameEnd.collideWorldBounds = true;
+          this.cat.animations.add('end', [0], 1, true);
+
 
           this.player1 = this.spritesheet =game.add.sprite(120, 420, "spritesheet");
           this.player1.enableBody = true;
@@ -84,8 +92,8 @@ const mainState =
           }
 
           this.score = 0;
-          var score = game.add.text(500, 20, `Score: ${this.score} \nHighScore: ${this.highScore}`, { font: '20px Arial', fill: '#ffffff' });
-          score.fixedToCamera = true;
+          this.scoreDisplay = game.add.text(500, 20, `Score: ${this.score} \nHighScore: ${this.highScore}`, { font: '20px Arial', fill: '#ffffff' });
+          this.scoreDisplay.fixedToCamera = true;
 
           this.cursors = game.input.keyboard.createCursorKeys();
           game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
@@ -119,11 +127,9 @@ const mainState =
       },
 
       hit: function (bullet, greyspider) {
-          this.score = this.score + 10;
-          this.greyspider.healthPoints = this.greyspider.healthPoints - 50;
-          if (this.greyspider.healthPoints === 0)
-          {this.greyspider.kill();
-          }
+          this.score = this.score + 50;
+          this.greyspider.kill();
+          this.scoreDisplay.text = `Score: ${this.score} \nHighScore: ${this.highScore}`;
 
           //this.bullets.kill();
     },
@@ -136,12 +142,24 @@ const mainState =
     //}
 
       player1GotHit: function () {
-        console.log('you died');
+        console.log('you died!');
         //this.explosion.reset(this.player1.x + (this.player1.width / 2), this.player1.y + (this.player1.height / 2));
         this.player1.kill();
         game.state.start('gameover');
 
       },
+
+      player1Win: function () {
+        console.log('you win!');
+        //this.explosion.reset(this.player1.x + (this.player1.width / 2), this.player1.y + (this.player1.height / 2));
+        this.player1.kill();
+        game.state.start('gamewin');
+
+      },
+
+
+
+
 
 
 
@@ -157,7 +175,7 @@ const mainState =
 
       game.physics.arcade.overlap(this.bullets, this.greyspider, this.hit, null, this);
       game.physics.arcade.overlap(this.greyspider, this.player1, this.player1GotHit, null, this);
-
+      game.physics.arcade.overlap(this.player1, this.gameEnd, this.player1Win, null, this);
 
 
       //this.player1.body.velocity.x = 0;
@@ -241,7 +259,22 @@ const mainState =
     }
   };
 
+
+  const gamewinState = {
+    preload: function () {
+      game.load.image('gamewin', 'assets/gamewinscreen.png');
+    },
+    create: function () {
+      const gameOverImg = game.cache.getImage('gamewin');
+      game.add.sprite(
+        game.camera.centerX - gameOverImg.width / 2,
+        game.camera.centerY - gameOverImg.height / 2,
+        'gamewin');
+      game.input.onDown.add(() => { game.state.start('main'); });
+    }
+  };
   const game = new Phaser.Game(650, 650);
   game.state.add('main', mainState);
   game.state.add('gameover', gameoverState);
+  game.state.add('gamewin', gamewinState);
   game.state.start('main');
