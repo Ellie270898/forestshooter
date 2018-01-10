@@ -11,9 +11,11 @@ const mainState =
           game.load.image('foreground', 'assets/foreground.png');
           game.load.image('greyspider', 'assets/greyspider2.png');
           game.load.spritesheet('spider', 'assets/spiderSpritesheet.png', 600, 725 );
-          game.load.spritesheet('spider2', 'assets/spiderSpritesheet.png', 600, 725 );
+          game.load.spritesheet('spider2', 'assets/spiderSpritesheet2.png', 420, 525 );
+          game.load.spritesheet('spider3', 'assets/spiderSpritesheet3.png', 420, 675 );
           game.load.image('gameover', 'assets/gameoverscreen2.png');
-          game.load.image('gamewin', 'assets/gamewinscreen.png');
+          game.load.image('gamewin', 'assets/youwin.png');
+          game.load.image('gameStartScreen', 'assets/gameStartScreen.png');
       },
 
 
@@ -25,11 +27,24 @@ const mainState =
           var player1;
           var cursors;
 
+
           this.game.physics.startSystem(Phaser.Physics.ARCADE);
+
 
           game.add.tileSprite(0, 0, 3440, 650, 'background');
 
+          this.gameStartScreen = game.add.sprite(0, 0, 'gameStartScreen');
+
           game.world.setBounds(0, 0, 3040, 650);
+
+          game.input.onDown.add(this.beginning, this);
+
+          this.gameStart = this.cat1 = game.add.sprite(73, -40, 'cat');
+          this.gameStart.enableBody = true;
+          game.physics.arcade.enable(this.gameStart);
+          this.gameStart.physicsBodyType = Phaser.Physics.ARCADE;
+          this.gameStart.collideWorldBounds = true;
+          this.cat1.animations.add('start', [0,1,2,3,4,5], 7);
 
           this.gameEnd = this.cat = game.add.sprite(2700, -30, 'cat');
           this.gameEnd.enableBody = true;
@@ -39,6 +54,7 @@ const mainState =
           this.cat.animations.add('end', [0], 1, true);
 
 
+          //This code creates the player and animations for running and walking
           this.player1 = this.spritesheet =game.add.sprite(120, 420, "spritesheet");
           this.player1.enableBody = true;
           game.physics.arcade.enable(this.player1);
@@ -49,22 +65,37 @@ const mainState =
           this.spritesheet.animations.add('shoot', [9], 1, true);
           this.speed = 4;
 
-
+          //FIRST SPIDER
           this.greyspider = this.spider =game.add.sprite(1000, -100, 'spider');
-          //game.physics.arcade.enable(this.greyspider);
           this.greyspider.enableBody = true;
           game.physics.arcade.enable(this.greyspider);
           this.greyspider.physicsBodyType = Phaser.Physics.ARCADE;
           this.spider.animations.add('spidermove', [0,1,2,3,4,3,2,1], 4, true);
           this.spider.healthPoints = 100;
 
+          //SECOND SPIDER
+          this.greyspider2 = this.spider2 =game.add.sprite(1780, -100, 'spider2');
+          this.greyspider2.enableBody = true;
+          game.physics.arcade.enable(this.greyspider2);
+          this.greyspider2.physicsBodyType = Phaser.Physics.ARCADE;
+          this.spider2.animations.add('spidermove2', [3,4,3,2,1,0,1,2], 4, true);
+          this.spider2.healthPoints = 100;
+
+          //THIRD SPIDER
+          this.greyspider3 = this.spider3 =game.add.sprite(2580, 0, 'spider3');
+          this.greyspider3.enableBody = true;
+          game.physics.arcade.enable(this.greyspider3);
+          this.greyspider3.physicsBodyType = Phaser.Physics.ARCADE;
+          this.spider3.animations.add('spidermove3', [1,2,3,4,3,2,1,0], 4, true);
+          this.spider3.healthPoints = 100;
 
 
 
+          //BULLETS
           this.bullets = game.add.group();
           this.bullets.enableBody = true;
           this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-          this.bullets.lifespan = 2.5;
+          this.bullets.lifespan = 2;
 
 
             for (let i = 0; i < 20; i++) {
@@ -82,15 +113,15 @@ const mainState =
         //This tells the camera to follow the player
           game.camera.follow(player1);
 
-        //This adds some trees to the front, adding more depth to the game world
-          game.add.sprite(0, 0, 'foreground');
+          //This adds some trees to the front, adding more depth to the game world
+            game.add.sprite(0, 0, 'foreground');
 
           this.highScore = localStorage.getItem('shooterhighscore');
           if (this.highScore === null) {
             localStorage.setItem('shooterhighscore', 0);
             this.highScore = 0;
           }
-
+          //This displays a score and determines the font, size and colour
           this.score = 0;
           this.scoreDisplay = game.add.text(500, 20, `Score: ${this.score} \nHighScore: ${this.highScore}`, { font: '20px Arial', fill: '#ffffff' });
           this.scoreDisplay.fixedToCamera = true;
@@ -108,10 +139,10 @@ const mainState =
 
             let bullet = this.bullets.getFirstExists(false);
             if (bullet) {
-              bullet.reset(this.player1.x + (this.player1.width - 30), this.player1.y + 40);
-              bullet.body.velocity.x = + 800;
+              bullet.reset(this.player1.x + (this.player1.width - 35), this.player1.y + 30);
+              bullet.body.velocity.x = + 500;
+              bullet.body.velocity.y = - 700;
               this.bulletTime = game.time.now + 200;
-              //this.bullet.lifespan = 25;
 
             }
           }
@@ -131,19 +162,32 @@ const mainState =
           this.greyspider.kill();
           this.scoreDisplay.text = `Score: ${this.score} \nHighScore: ${this.highScore}`;
 
-          //this.bullets.kill();
+
     },
-    //},
+
+    hit2: function (bullet, greyspider2) {
+        this.score = this.score + 50;
+        this.greyspider2.kill();
+        this.scoreDisplay.text = `Score: ${this.score} \nHighScore: ${this.highScore}`;
 
 
-    //function hitgreyspider() {
-      //console.log('you encounter an greyspider');
-      //this.foundSound.play();
-    //}
+  },
+
+  hit3: function (bullet, greyspider3) {
+      this.score = this.score + 50;
+      this.greyspider3.kill();
+      this.scoreDisplay.text = `Score: ${this.score} \nHighScore: ${this.highScore}`;
+
+
+},
+
+  beginning: function() {
+    this.gameStartScreen.kill();
+    this.cat1.animations.play('start');
+  },
 
       player1GotHit: function () {
         console.log('you died!');
-        //this.explosion.reset(this.player1.x + (this.player1.width / 2), this.player1.y + (this.player1.height / 2));
         this.player1.kill();
         game.state.start('gameover');
 
@@ -151,7 +195,6 @@ const mainState =
 
       player1Win: function () {
         console.log('you win!');
-        //this.explosion.reset(this.player1.x + (this.player1.width / 2), this.player1.y + (this.player1.height / 2));
         this.player1.kill();
         game.state.start('gamewin');
 
@@ -175,35 +218,13 @@ const mainState =
 
       game.physics.arcade.overlap(this.bullets, this.greyspider, this.hit, null, this);
       game.physics.arcade.overlap(this.greyspider, this.player1, this.player1GotHit, null, this);
+      game.physics.arcade.overlap(this.bullets, this.greyspider2, this.hit2, null, this);
+      game.physics.arcade.overlap(this.greyspider2, this.player1, this.player1GotHit, null, this);
       game.physics.arcade.overlap(this.player1, this.gameEnd, this.player1Win, null, this);
+      game.physics.arcade.overlap(this.greyspider3, this.player1, this.player1GotHit, null, this);
+      game.physics.arcade.overlap(this.bullets, this.greyspider3, this.hit3, null, this);
 
-
-      //this.player1.body.velocity.x = 0;
-    //  this.player1.body.velocity.y = 0;
-
-    //  this.player1.body.velocity.x = 0;
-
-
-
-    //    player1.body.setZeroVelocity();
-
-      //  if (cursors.up.isDown)
-      //  {
-      //      player1.body.moveUp(300)
-      //  }
-      //  else if (cursors.down.isDown)
-      //  {
-      //      player1.body.moveDown(300);
-      //  }
-
-      //  if (cursors.left.isDown)
-      //  {
-      //      player1.body.velocity.x = -300;
-      //  }
-      //  else if (cursors.right.isDown)
-      //  {
-        //    player1.body.moveRight(300);
-      //  }
+      //THIS ALLOWS THE CAMERA AND PLAYER TO MOVE LEFT WHEN THE LEFT ARROW IS HELD DOWN
       if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
           {
             this.spritesheet.x-=this.speed;
@@ -211,7 +232,7 @@ const mainState =
             this.spritesheet.scale.x=-1;
             game.camera.x = this.player1.x - 200;
             game.camera.y = this.player1.y - 200;
-
+      //THIS ALLOWS THE CAMERA AND PLAYER TO MOVE RIGHT WHEN THE RIGHT ARROW IS HELD DOWN
           }
           else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
           {
@@ -227,10 +248,13 @@ const mainState =
               //console.log("shoot");
               this.shoot();
               this.fire();
-          } else
+            }
+            else
           {
             this.spritesheet.play('still');
             this.spider.play('spidermove');
+            this.spider2.play('spidermove2');
+            this.spider3.play('spidermove3');
           }
         },
 
@@ -262,7 +286,7 @@ const mainState =
 
   const gamewinState = {
     preload: function () {
-      game.load.image('gamewin', 'assets/gamewinscreen.png');
+      game.load.image('gamewin', 'assets/youwin.png');
     },
     create: function () {
       const gameOverImg = game.cache.getImage('gamewin');
@@ -270,11 +294,153 @@ const mainState =
         game.camera.centerX - gameOverImg.width / 2,
         game.camera.centerY - gameOverImg.height / 2,
         'gamewin');
-      game.input.onDown.add(() => { game.state.start('main'); });
+      game.input.onDown.add(() => { game.state.start('mini'); });
     }
   };
+  const miniState = {
+
+  create: function () {
+    game.add.tileSprite(0, 0, 650, 650, 'background2');
+    game.world.setBounds(0, 0, 650, 650);
+
+    this.ship = game.add.sprite(400, 550, 'ship');
+    game.physics.enable(this.ship, Phaser.Physics.ARCADE);
+
+    this.aliens = game.add.group();
+    this.aliens.enableBody = true;
+    this.aliens.physicsBodyType = Phaser.Physics.ARCADE;
+
+    for (let i = 0; i < 48; i++) {
+      let c = this.aliens.create(20 + (i % 8) * 80, 80 + Math.floor(i / 8) * 60, 'enemy');
+      c.body.immovable = true;
+    }
+
+    this.bullets = game.add.group();
+    this.bullets.enableBody = true;
+    this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+    for (let i = 0; i < 20; i++) {
+      let b = this.bullets.create(0, 0, 'bullet');
+      b.exists = false;
+      b.visible = false;
+      b.checkWorldBounds = true;
+      b.events.onOutOfBounds.add((bullet) => { bullet.kill(); });
+    }
+
+    this.bulletTime = 0;
+
+  //  this.explosion = this.game.add.sprite(0, 0, 'explode');
+  //  this.explosion.exists = false;
+  //  this.explosion.visible = false;
+    // this.explosion.frame = 6; // show one frame of the spritesheet
+  //  this.explosion.anchor.x = 0.5;
+  //  this.explosion.anchor.y = 0.5;
+  //  this.explosion.animations.add('boom');
+
+    this.highScore = localStorage.getItem('invadershighscore');
+    if (this.highScore === null) {
+      localStorage.setItem('invadershighscore', 0);
+      this.highScore = 0;
+    }
+
+    this.score = 0;
+    this.scoreDisplay = game.add.text(200, 20, `Score: ${this.score} \nHighScore: ${this.highScore}`, { font: '30px Arial', fill: '#ffffff' });
+
+    this.fireSound = game.add.audio('fire');
+
+    this.cursors = game.input.keyboard.createCursorKeys();
+    game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+  },
+
+  fire1: function () {
+    if (game.time.now > this.bulletTime) {
+      this.fireSound.play();
+      let bullet = this.bullets.getFirstExists(false);
+      if (bullet) {
+        bullet.reset(this.ship.x + (this.ship.width / 2), this.ship.y - (this.ship.height + 5));
+        bullet.body.velocity.y = -300;
+        this.bulletTime = game.time.now + 150;
+      }
+    }
+  },
+
+  gameOver: function () {
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      localStorage.setItem('invadershighscore', this.highScore);
+    }
+    game.state.start('gameover');
+  },
+
+  hit: function (bullet, enemy) {
+    this.score = this.score + 10;
+    bullet.kill();
+    enemy.kill();
+    if (this.aliens.countLiving() === 0) {
+      this.score = this.score + 100;
+      this.gameOver();
+    }
+    this.scoreDisplay.text = `Score: ${this.score} \nHighScore: ${this.highScore}`;
+  },
+
+  preload: function () {
+    game.load.image('background2','assets/minigamemap.png');
+    game.load.image('ship', 'assets/spaceCat.png');
+    game.load.image('enemy', 'assets/spaceSpider1.png');
+    game.load.image('bullet', 'assets/bullet.png');
+    //game.load.spritesheet('explode', 'assets/explode.png', 128, 128);
+    //game.load.audio('fire', 'assets/fire.mp3');
+  },
+
+  shipGotHit: function (alien, ship) {
+  //  this.explosion.reset(this.ship.x + (this.ship.width / 2), this.ship.y + (this.ship.height / 2));
+    this.ship.kill();
+    //this.explosion.animations.play('boom');
+  },
+
+  update: function () {
+
+
+    game.physics.arcade.overlap(this.bullets, this.aliens, this.hit, null, this);
+    game.physics.arcade.overlap(this.aliens, this.ship, this.shipGotHit, null, this);
+
+    this.ship.body.velocity.x = 0;
+    this.aliens.forEach(
+      (alien) => {
+        alien.body.position.y = alien.body.position.y + 0.1;
+        if (alien.y + alien.height > game.height) { this.gameOver(); }
+      }
+    );
+
+    if (this.cursors.left.isDown) {
+      this.ship.body.velocity.x = -300;
+    } else if (this.cursors.right.isDown) {
+      this.ship.body.velocity.x = 300;
+    }
+    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+      this.fire1();
+    }
+  }
+};
+
+const gameover1State = {
+  preload: function () {
+    game.load.image('gameover', 'assets/gameover.jpg');
+  },
+  create: function () {
+    const gameOverImg = game.cache.getImage('gameover');
+    game.add.sprite(
+      game.world.centerX - gameOverImg.width / 2,
+      game.world.centerY - gameOverImg.height / 2,
+      'gameover');
+    game.input.onDown.add(() => { game.state.start('main'); });
+  }
+};
+
+
   const game = new Phaser.Game(650, 650);
   game.state.add('main', mainState);
   game.state.add('gameover', gameoverState);
   game.state.add('gamewin', gamewinState);
+  game.state.add('mini', miniState);
   game.state.start('main');
